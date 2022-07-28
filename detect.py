@@ -12,8 +12,8 @@ if __name__ == '__main__':
     with Pool(os.cpu_count()+3) as pool:
         for i in pool.imap(recognizer, voiced):
             if not i is None:
-                _trans = translator.translate(i, dest='zh-cn')
-                trans.append(_trans)
-                print(_trans)
+                _trans = translator.translate(i, src='ja', dest='zh-cn')
+                trans.append(_trans.text)
+                print(_trans.text)
 
     print([(r, t) for r, t in zip(regions, trans) if t])
