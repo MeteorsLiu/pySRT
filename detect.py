@@ -6,8 +6,9 @@ from googletrans import Translator
 
 if __name__ == '__main__':
     recognizer = SpeechRecognizer()
-    regions, voiced = getSlices("GVRD-94/1.wav")
+    regions, voiced = getSlices("../GVRD-94/1.wav")
     trans = []
+    translator = Translator()
     with Pool(os.cpu_count()+3) as pool:
         for i in pool.imap(recognizer, voiced):
             if i:
