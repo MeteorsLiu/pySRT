@@ -75,7 +75,7 @@ class SpeechRecognizer(object): # pylint: disable=too-few-public-methods
         try:
             for _ in range(self.retries):
                 url = GOOGLE_SPEECH_API_URL.format(lang=self.language, key=self.api_key)
-                headers = {"Content-Type": "audio/l16; rate=16000"}
+                headers = {"Content-Type": "audio/l16; rate=16000;"}
 
                 try:
                     resp = requests.post(url, data=data, headers=headers)
