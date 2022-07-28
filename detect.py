@@ -12,5 +12,6 @@ if __name__ == '__main__':
         for i in pool.imap(recognizer, voiced):
             if i:
                 trans.append(i)
+                print(i)
 
     print([(r, t) for r, t in zip(regions, trans) if t])
