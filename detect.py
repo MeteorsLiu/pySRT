@@ -2,6 +2,8 @@ from webvad import getSlices
 from autosub import SpeechRecognizer
 import os
 from multiprocessing import Pool, TimeoutError
+from autosub.formatters import FORMATTERS
+
 
 if __name__ == '__main__':
     recognizer = SpeechRecognizer()
@@ -13,4 +15,8 @@ if __name__ == '__main__':
                 trans.append(i)
                 print(i)
 
-    print([(r, t) for r, t in zip(regions, trans) if t])
+    timed = [(r, t) for r, t in zip(regions, trans) if t]
+    formatter = FORMATTERS.get("srt")
+    formatted_subtitles = formatter(timed)
+    with open("../GVRD-94/GVRD-94_01.srt", 'wb') as output_file:
+        output_file.write(formatted_subtitles.encode("utf-8"))
