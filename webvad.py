@@ -98,7 +98,7 @@ def vad_collector(sample_rate, frame_duration_ms,
             # TRIGGERED state.
             if num_voiced > 0.9 * ring_buffer.maxlen:
                 triggered = True
-                start = ring_buffer[0][0].timestamp
+                start = ring_buffer[0][0].timestamp + ring_buffer[0][0].duration
                 # We want to yield all the audio we see from now until
                 # we are NOTTRIGGERED, but we have to start with the
                 # audio that's already in the ring buffer.
