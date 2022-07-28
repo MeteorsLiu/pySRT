@@ -6,16 +6,11 @@ Defines autosub's main functionality.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import argparse
-import audioop
-import math
-import multiprocessing
+
 import os
 from json import JSONDecodeError
 import subprocess
-import sys
 import tempfile
-import wave
 
 import json
 import requests
@@ -27,27 +22,12 @@ except ImportError:
 from autosub.constants import (
     LANGUAGE_CODES, GOOGLE_SPEECH_API_KEY, GOOGLE_SPEECH_API_URL,
 )
-from autosub.formatters import FORMATTERS
 
 DEFAULT_SUBTITLE_FORMAT = 'srt'
 DEFAULT_CONCURRENCY = 10
 DEFAULT_SRC_LANGUAGE = 'en'
 DEFAULT_DST_LANGUAGE = 'en'
 
-
-def percentile(arr, percent):
-    """
-    Calculate the given percentile of arr.
-    """
-    arr = sorted(arr)
-    index = (len(arr) - 1) * percent
-    floor = math.floor(index)
-    ceil = math.ceil(index)
-    if floor == ceil:
-        return arr[int(index)]
-    low_value = arr[int(floor)] * (ceil - index)
-    high_value = arr[int(ceil)] * (index - floor)
-    return low_value + high_value
 
 
 class FLACConverter(object): # pylint: disable=too-few-public-methods
@@ -168,44 +148,5 @@ def extract_audio(filename, channels=1, rate=16000):
     use_shell = True if os.name == "nt" else False
     subprocess.check_output(command, stdin=open(os.devnull), shell=use_shell)
     return temp.name, rate
-
-
-def find_speech_regions(filename, frame_width=4096, min_region_size=0.5, max_region_size=6): # pylint: disable=too-many-locals
-    """
-    Perform voice activity detection on a given audio file.
-    """
-    reader = wave.open(filename)
-    sample_width = reader.getsampwidth()
-    rate = reader.getframerate()
-    n_channels = reader.getnchannels()
-    chunk_duration = float(frame_width) / rate
-
-    n_chunks = int(math.ceil(reader.getnframes()*1.0 / frame_width))
-    energies = []
-
-    for _ in range(n_chunks):
-        chunk = reader.readframes(frame_width)
-        energies.append(audioop.rms(chunk, sample_width * n_channels))
-
-    threshold = percentile(energies, 0.2)
-
-    elapsed_time = 0
-
-    regions = []
-    region_start = None
-
-    for energy in energies:
-        is_silence = energy <= threshold
-        max_exceeded = region_start and elapsed_time - region_start >= max_region_size
-
-        if (max_exceeded or is_silence) and region_start:
-            if elapsed_time - region_start >= min_region_size:
-                regions.append((region_start, elapsed_time))
-                region_start = None
-
-        elif (not region_start) and (not is_silence):
-            region_start = elapsed_time
-        elapsed_time += chunk_duration
-    return regions
 
 
