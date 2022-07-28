@@ -85,7 +85,7 @@ def vad_collector(sample_rate, frame_duration_ms,
     triggered = False
     regions = []
     voiced_frames = []
-    start = None
+    start = frames[0].timestamp + frames[0].duration
     all_voiced = []
     for frame in frames:
         is_speech = vad.is_speech(frame.bytes, sample_rate)
@@ -98,7 +98,7 @@ def vad_collector(sample_rate, frame_duration_ms,
             # TRIGGERED state.
             if num_voiced > 0.9 * ring_buffer.maxlen:
                 triggered = True
-                start = ring_buffer[0][0].timestamp + ring_buffer[0][0].duration
+                end = ring_buffer[0][0].timestamp + ring_buffer[0][0].duration
                 # We want to yield all the audio we see from now until
                 # we are NOTTRIGGERED, but we have to start with the
                 # audio that's already in the ring buffer.
@@ -115,8 +115,9 @@ def vad_collector(sample_rate, frame_duration_ms,
             # unvoiced, then enter NOTTRIGGERED and yield whatever
             # audio we've collected.
             if num_unvoiced > 0.9 * ring_buffer.maxlen:
-                regions.append((start, frame.timestamp + frame.duration))
-                start = None
+                if start:
+                    regions.append((start, end))
+                start = frame.timestamp + frame.duration
                 triggered = False
                 all_voiced.append(b''.join([f.bytes for f in voiced_frames]))
                 ring_buffer.clear()
@@ -124,7 +125,7 @@ def vad_collector(sample_rate, frame_duration_ms,
     # If we have any leftover voiced audio when we run out of input,
     # yield it.
     if voiced_frames:
-        regions.append((start, frame.timestamp + frame.duration))
+        regions.append((start, end))
         all_voiced.append(b''.join([f.bytes for f in voiced_frames]))
     return regions, all_voiced
 
