@@ -28,8 +28,6 @@ async def getGoogle(data):
                         line = json.loads(line)
                         line = line['result'][0]['alternative'][0]['transcript']
                         return line[:1].upper() + line[1:]
-            except IndexError:
-                return None
             except Exception as e:
                 time.sleep(1)
                 print("Retry %d" % t)
@@ -37,7 +35,7 @@ async def getGoogle(data):
 async def main():
     regions, filename = find_speech_regions("../GVRD-94/GVRD-94_01.mkv")
     trans = []
-    converter = FLACConverter(source_path=filename)
+    converter = FLACConverter(source_path="../GVRD-94/GVRD-94_01.mkv")
     with Pool(10) as pool:
         for i in pool.imap(converter, regions):
             t = await getGoogle(i)
