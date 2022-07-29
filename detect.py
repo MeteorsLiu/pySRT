@@ -1,5 +1,4 @@
 
-from fileinput import filename
 from autosub import find_speech_regions
 import os
 from multiprocessing import Pool, TimeoutError
@@ -12,7 +11,7 @@ from autosub.constants import (
 import json
 import time
 
-from pySRT.autosub import FLACConverter
+from autosub import FLACConverter
 async def getGoogle(data):
     timeout = aiohttp.ClientTimeout(total=300)
     headers = {
