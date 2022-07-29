@@ -22,9 +22,10 @@ async def getGoogle(data):
                         line = json.loads(line)
                         line = line['result'][0]['alternative'][0]['transcript']
                         return line[:1].upper() + line[1:]
-            except:
+            except Exception as e:
                 time.sleep(1)
                 print("Retry %d" % t)
+                print(e)
 async def main():
     regions, voiced = getSlices("../GVRD-94/1.wav")
     trans = []
