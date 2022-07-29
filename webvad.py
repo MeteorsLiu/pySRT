@@ -130,7 +130,7 @@ def vad_collector(sample_rate, frame_duration_ms,
 
 def getSlices(filename):
     audio, sample_rate = read_wave(filename)
-    vad = webrtcvad.Vad(1)
+    vad = webrtcvad.Vad(3)
     frames = frame_generator(30, audio, sample_rate)
     frames = list(frames)
     return vad_collector(sample_rate, 30, 300, vad, frames)

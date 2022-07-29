@@ -25,14 +25,12 @@ async def getGoogle(bdata):
                         return line[:1].upper() + line[1:]
             except:
                 continue
-
-if __name__ == '__main__':
-    recognizer = SpeechRecognizer()
+async def main():
     regions, voiced = getSlices("../GVRD-94/1.wav")
     trans = []
 
     for v in voiced:
-        i = getGoogle(v)
+        i = await getGoogle(v)
         if i:
             print(i)
             trans.append(i)
@@ -42,3 +40,5 @@ if __name__ == '__main__':
     formatted_subtitles = formatter(timed)
     with open("../GVRD-94/GVRD-94_01.srt", 'wb') as output_file:
         output_file.write(formatted_subtitles.encode("utf-8"))
+if __name__ == '__main__':
+    asyncio.run(main)
