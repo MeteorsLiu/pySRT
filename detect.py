@@ -19,7 +19,10 @@ def main():
     recongizer = SpeechRecognizer()
     with Pool(10) as pool:
         for i in pool.imap(converter, regions):
-            recongizer(i)
+            t = recongizer(i)
+            if t:
+                print(t)
+                trans.append(t)
     timed = [(r, t) for r, t in zip(regions, trans) if t]
     formatter = FORMATTERS.get("srt")
     formatted_subtitles = formatter(timed)
