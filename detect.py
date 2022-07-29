@@ -18,7 +18,8 @@ async def getGoogle(bdata):
         for _ in range(5):
             try:
                 async with session.post(GOOGLE_SPEECH_API_URL.format(lang="ja", key=GOOGLE_SPEECH_API_KEY), data=v, headers=headers, timeout=timeout) as resp:
-                    for line in resp.content.decode('utf-8').split("\n"):
+                    res = await resp.text()
+                    for line in res.split("\n"):
                         line = json.loads(line)
                         line = line['result'][0]['alternative'][0]['transcript']
                         return line[:1].upper() + line[1:]
