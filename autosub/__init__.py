@@ -99,11 +99,11 @@ class FLACConverter(object): # pylint: disable=too-few-public-methods
             start = max(0, start - self.include_before)
             end += self.include_after
             #delete=False necessary for running on Windows
-            temp = tempfile.NamedTemporaryFile(suffix='.wav', delete=False)
+            temp = tempfile.NamedTemporaryFile(suffix='.flac', delete=False)
             program_ffmpeg = which("ffmpeg")
-            command = [str(program_ffmpeg), "-ss", str(start), "-t", str(end - start),  
+            command = [str(program_ffmpeg), "-ss", str(start), "-t", str(end - start),
                        "-y", "-i", self.source_path,
-                       "-loglevel", "error", "-ac", "1", "-ar", "44100", temp.name]
+                       "-loglevel", "error", temp.name]
             use_shell = True if os.name == "nt" else False
             subprocess.check_output(command, stdin=open(os.devnull), shell=use_shell)
             read_data = temp.read()
@@ -113,6 +113,7 @@ class FLACConverter(object): # pylint: disable=too-few-public-methods
 
         except KeyboardInterrupt:
             return None
+
 
 
 class SpeechRecognizer(object): # pylint: disable=too-few-public-methods

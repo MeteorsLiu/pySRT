@@ -15,7 +15,7 @@ from autosub import FLACConverter
 async def getGoogle(data):
     timeout = aiohttp.ClientTimeout(total=300)
     headers = {
-        "Content-Type": "audio/l16; rate=44100;",
+        "Content-Type": "audio/x-flac; rate=44100;",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
     }
     async with aiohttp.ClientSession(headers=headers) as session:   
