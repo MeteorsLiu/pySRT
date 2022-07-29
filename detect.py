@@ -1,5 +1,6 @@
-from webvad import getSlices
-from autosub import SpeechRecognizer
+
+from fileinput import filename
+from autosub import find_speech_regions
 import os
 from multiprocessing import Pool, TimeoutError
 from autosub.formatters import FORMATTERS
@@ -10,6 +11,8 @@ from autosub.constants import (
 )
 import json
 import time
+
+from pySRT.autosub import FLACConverter
 async def getGoogle(data):
     timeout = aiohttp.ClientTimeout(total=300)
     headers = {
@@ -33,13 +36,15 @@ async def getGoogle(data):
                 print("Retry %d" % t)
                 print(e)
 async def main():
-    regions, voiced = getSlices("../GVRD-94/1.wav")
+    regions, filename = find_speech_regions("../GVRD-94/GVRD-94_01.mkv")
     trans = []
-    for v in voiced:
-        i = await getGoogle(v)
-        if i:
-            print(i)
-            trans.append(i)
+    converter = FLACConverter(source_path=filename)
+    with Pool(10) as pool:
+        for i in pool.imap(converter, regions):
+            t = await getGoogle(i)
+            if t:
+                print(t)
+                trans.append(t)
     timed = [(r, t) for r, t in zip(regions, trans) if t]
     formatter = FORMATTERS.get("srt")
     formatted_subtitles = formatter(timed)
