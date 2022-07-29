@@ -20,8 +20,11 @@ async def getGoogle(data):
                     res = await resp.text()
                     for line in res.split("\n"):
                         line = json.loads(line)
+                        print(line)
                         line = line['result'][0]['alternative'][0]['transcript']
                         return line[:1].upper() + line[1:]
+            except IndexError:
+                return None
             except Exception as e:
                 time.sleep(1)
                 print("Retry %d" % t)
