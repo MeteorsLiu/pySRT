@@ -23,9 +23,9 @@ async def getGoogle(data):
             try:
                 async with session.post(GOOGLE_SPEECH_API_URL.format(lang="ja", key=GOOGLE_SPEECH_API_KEY), data=data) as resp:
                     res = await resp.text()
+                    print(res)
                     for line in res.split("\n"):
                         line = json.loads(line)
-                        print(line)
                         line = line['result'][0]['alternative'][0]['transcript']
                         return line[:1].upper() + line[1:]
             except IndexError:
