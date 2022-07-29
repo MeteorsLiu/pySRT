@@ -14,6 +14,7 @@ import tempfile
 
 import json
 import requests
+
 try:
     from json.decoder import JSONDecodeError
 except ImportError:

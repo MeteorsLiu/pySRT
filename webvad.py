@@ -16,7 +16,7 @@ def read_wave(path):
         sample_width = wf.getsampwidth()
         assert sample_width == 2
         sample_rate = wf.getframerate()
-        assert sample_rate in (8000, 16000, 32000, 48000)
+        assert sample_rate in (8000, 16000, 32000, 44100, 48000)
         pcm_data = wf.readframes(wf.getnframes())
         return pcm_data, sample_rate
 
@@ -130,7 +130,7 @@ def vad_collector(sample_rate, frame_duration_ms,
 
 def getSlices(filename):
     audio, sample_rate = read_wave(filename)
-    vad = webrtcvad.Vad(3)
+    vad = webrtcvad.Vad(2)
     frames = frame_generator(30, audio, sample_rate)
     frames = list(frames)
     return vad_collector(sample_rate, 30, 300, vad, frames)

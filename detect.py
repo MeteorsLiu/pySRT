@@ -12,11 +12,14 @@ import json
 import time
 async def getGoogle(data):
     timeout = aiohttp.ClientTimeout(total=300)
-    headers = {"Content-Type": "audio/l16; rate=16000;"}
-    async with aiohttp.ClientSession() as session:   
+    headers = {
+        "Content-Type": "audio/l16; rate=44100;",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+    }
+    async with aiohttp.ClientSession(headers=headers) as session:   
         for t in range(5):
             try:
-                async with session.post(GOOGLE_SPEECH_API_URL.format(lang="ja", key=GOOGLE_SPEECH_API_KEY), data=data, headers=headers, timeout=timeout) as resp:
+                async with session.post(GOOGLE_SPEECH_API_URL.format(lang="ja", key=GOOGLE_SPEECH_API_KEY), data=data) as resp:
                     res = await resp.text()
                     for line in res.split("\n"):
                         line = json.loads(line)
