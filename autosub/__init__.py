@@ -25,6 +25,7 @@ import audioop
 from autosub.constants import (
     LANGUAGE_CODES, GOOGLE_SPEECH_API_KEY, GOOGLE_SPEECH_API_URL,
 )
+import time
 
 DEFAULT_SUBTITLE_FORMAT = 'srt'
 DEFAULT_CONCURRENCY = 10
@@ -120,38 +121,37 @@ class SpeechRecognizer(object): # pylint: disable=too-few-public-methods
     """
     Class for performing speech-to-text for an input FLAC file.
     """
-    def __init__(self, language="ja", rate=16000, retries=3, api_key=GOOGLE_SPEECH_API_KEY):
+    def __init__(self, language="ja", rate=44100, retries=3, api_key=GOOGLE_SPEECH_API_KEY):
         self.language = language
         self.rate = rate
         self.api_key = api_key
         self.retries = retries
 
     def __call__(self, data):
-        try:
-            for _ in range(self.retries):
-                url = GOOGLE_SPEECH_API_URL.format(lang=self.language, key=self.api_key)
-                headers = {"Content-Type": "audio/l16; rate=16000;"}
-
+        
+            for i in range(5):
                 try:
+                    url = GOOGLE_SPEECH_API_URL.format(lang="ja", key=self.api_key)
+                    headers = {"Content-Type": "audio/x-flac; rate=%d" % self.rate}
+
+                    
                     resp = requests.post(url, data=data, headers=headers)
-                except requests.exceptions.ConnectionError:
+
+
+                    for line in resp.content.decode('utf-8').split("\n"):
+                        try:
+                            line = json.loads(line)
+                            line = line['result'][0]['alternative'][0]['transcript']
+                            return line[:1].upper() + line[1:]
+                        except IndexError:
+                            # no result
+                            pass
+                        except JSONDecodeError:
+                            pass
+                except:
+                    time.sleep(1)
+                    print("Retry %d" % i)
                     continue
-
-                for line in resp.content.decode('utf-8').split("\n"):
-                    try:
-                        line = json.loads(line)
-                        line = line['result'][0]['alternative'][0]['transcript']
-                        return line[:1].upper() + line[1:]
-                    except IndexError:
-                        # no result
-                        continue
-                    except JSONDecodeError:
-                        continue
-
-        except KeyboardInterrupt:
-            return None
-
-
 
 
 def which(program):
